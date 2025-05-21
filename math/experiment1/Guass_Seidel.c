@@ -1,0 +1,72 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+// Gauss-Seidel迭代法求解线性方程组 Ax = b
+// 参数：A-系数矩阵，b-常数向量，x-解向量，n-方程阶数，iterations-迭代次数
+void gauss_seidel(double **A, double *b, double *x, int n, int iterations) {
+    int i, j, iter;
+    double sum;
+    
+    // 初始化解向量为零向量
+    for (i = 0; i < n; i++) {
+        x[i] = 0.0;
+    }
+    
+    // 执行指定次数的迭代
+    for (iter = 0; iter < iterations; iter++) {
+        printf("迭代 %d 次后的解:\n", iter+1);
+        
+        // 对每个未知数进行更新
+        for (i = 0; i < n; i++) {
+            sum = b[i];
+            
+            // 计算sum = b[i] - Σ(a[i][j]*x[j]) (j≠i)
+            for (j = 0; j < n; j++) {
+                if (j != i) {
+                    sum -= A[i][j] * x[j];
+                }
+            }
+            
+            // 更新x[i]
+            x[i] = sum / A[i][i];
+            printf("x%d = %.6f\n", i+1, x[i]);
+        }
+        printf("\n");
+    }
+}
+
+int main() {
+    int n = 3;  // 方程组阶数
+    int iterations = 10;  // 迭代次数
+    
+    // 动态分配矩阵和向量内存
+    double **A = (double **)malloc(n * sizeof(double *));
+    for (int i = 0; i < n; i++) {
+        A[i] = (double *)malloc(n * sizeof(double));
+    }
+    double *b = (double *)malloc(n * sizeof(double));
+    double *x = (double *)malloc(n * sizeof(double));
+    
+    // 示例方程组:
+    // 4x + y - z = 3
+    // 2x + 5y + z = 9
+    // x - 2y + 6z = -4
+    A[0][0] = 4.0; A[0][1] = 1.0; A[0][2] = -1.0; b[0] = 3.0;
+    A[1][0] = 2.0; A[1][1] = 5.0; A[1][2] = 1.0; b[1] = 9.0;
+    A[2][0] = 1.0; A[2][1] = -2.0; A[2][2] = 6.0; b[2] = -4.0;
+    
+    // 使用Gauss-Seidel方法求解
+    printf("Gauss-Seidel迭代法（迭代 %d 次）:\n\n", iterations);
+    gauss_seidel(A, b, x, n, iterations);
+    
+    // 释放内存
+    for (int i = 0; i < n; i++) {
+        free(A[i]);
+    }
+    free(A);
+    free(b);
+    free(x);
+    
+    return 0;
+}    
